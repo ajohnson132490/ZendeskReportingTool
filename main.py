@@ -30,29 +30,42 @@ params = {
 }
 
 # Searching
+tickets = []
 response = requests.get(search_url, params = params, auth = please)
 if response.status_code == 429:
     print("Rate limit reached. Waiting to retry...")
     time.sleep(response.headers['retry-after'])
     response = requests.get(search_url, params = params, auth = please)
 data = response.json()
+print(data["count"])
+tickets += data["results"]
+while (data["next_page"] != "null"):
+    response = requests.get(data["next_page"], params = params, auth = please)
+    if response.status_code == 429:
+        print("Rate limit reached. Waiting to retry...")
+        time.sleep(response.headers['retry-after'])
+        response = requests.get(search_url, params = params, auth = please)
+    data = response.json()
+    print(data["next_page"])
+    #tickets += data["results"]
 
-# Writing the data to a text file for storage
+print(f"{len(tickets)} tickets found.")
+## Writing the data to a text file for storage
 json_string = json.dumps(response.json(), indent=2)
 with open('json.txt', mode='w', encoding='utf-8') as f:
     f.write(json_string)
 
-with open('output.txt', mode='w', encoding='utf-8') as f:
-    with tqdm(range(0,100), total=len(data["results"]), ncols = 50, desc="Loading") as progress_bar:
-        for ticket in data["results"]:
-            f.write(f"TITLE: {ticket["subject"]}\n\n\nTICKET NUMBER: {ticket["id"]},  CREATED AT: {ticket["created_at"]}, LAST UPDATED: {ticket["updated_at"]}\
-                    \nREQUESTER: {h.searchForUserById(ticket["requester_id"], please)} ASSIGNEE: {h.searchForUserById(ticket["assignee_id"], please)}\
-                    \nTICKET FORM: {h.searchForTicketFormById(ticket["ticket_form_id"], please)}\nPRIORITY: {ticket["priority"]}\
-                    \nSTATUS: {ticket["status"]}\nTAGS: {ticket["tags"]}\nSATISFACTION RATING: {ticket["satisfaction_rating"]}\n\n")
-            f.write(h.searchForCommentsById(ticket["id"], please))
-            f.write("\n\n\n\n\n--------------------------END TICKET--------------------------\n\n\n\n\n")
-            progress_bar.update(1)
-
+#with open('output.txt', mode='w', encoding='utf-8') as f:
+#    with tqdm(range(0,100), total=data["count"], ncols = 100, desc="Loading") as progress_bar:
+#        for ticket in tickets:
+#            f.write(f"TITLE: {ticket["subject"]}\n\n\nTICKET NUMBER: {ticket["id"]},  CREATED AT: {ticket["created_at"]}, LAST UPDATED: {ticket["updated_at"]}\
+#                    \nREQUESTER: {h.searchForUserById(ticket["requester_id"], please)} ASSIGNEE: {h.searchForUserById(ticket["assignee_id"], please)}\
+#                    \nTICKET FORM: {h.searchForTicketFormById(ticket["ticket_form_id"], please)}\nPRIORITY: {ticket["priority"]}\
+#                    \nSTATUS: {ticket["status"]}\nTAGS: {ticket["tags"]}\nSATISFACTION RATING: {ticket["satisfaction_rating"]}\n\n")
+#            f.write(h.searchForCommentsById(ticket["id"], please))
+#            f.write("\n\n\n\n\n--------------------------END TICKET--------------------------\n\n\n\n\n")
+#            progress_bar.update(1)
+#
 # Manually reading all tickets from an export of all tickets
 #with open('Reports/export-2025-04-28-1748-1213727-407417159082436f25_3.json', mode='r', encoding='utf-8') as f:
 #    data = [json.loads(line) for line in f]
