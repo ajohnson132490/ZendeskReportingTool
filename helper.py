@@ -32,11 +32,11 @@ def printMenu():
         populatedSelections[1] = subject
     if "3" in userSelection:
         beforeOrAfter = input("Do you want to get tickets created before (1) or after (2) a certain date? ")
-        while (beforeOrAfter.isdigit() == False):
+        while (beforeOrAfter != "1" and beforeOrAfter != "2"):
             beforeOrAfter = input("Selection invalid, please type 1 or 2.\n")
         if "1" in beforeOrAfter: 
             creationDate = "<" + input("Type the date using the format yyyy-mm-dd: ")
-        else:
+        if "2" in beforeOrAfter:
             creationDate = ">" + input("Type the date using the format yyyy-mm-dd: ")
         populatedSelections[2] = creationDate
     if "4" in userSelection:
@@ -58,16 +58,16 @@ def printMenu():
         initStatus = input("Status: ").lower()
         greaterLessEqual = input("Do you want to get tickets that are greater than (1), less than (2), or equal to (3) this status? ")
         
-        while (not (greaterLessEqual.isdigit()) & (len(greaterLessEqual) == 1)):
+        while (greaterLessEqual != "1" and greaterLessEqual != "2" and greaterLessEqual != "3"):
             greaterLessEqual = input("Selection invalid, please type 1, 2, or 3.\n")
 
         if "1" in greaterLessEqual:
             status = ">" + initStatus
         if "2" in greaterLessEqual:
             status = "<" + initStatus
-        else:
+        if "3" in greaterLessEqual:
             status = ":" + initStatus
-        
+
         populatedSelections[8] = status
         
     return populatedSelections
