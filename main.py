@@ -6,7 +6,7 @@ import time
 from tqdm import tqdm
 import helper as h
 
-# Getting authorization
+## --Getting authorization-- ##
 with open('credentials.txt', mode='r') as f:
     subdomain = f.readline().strip()
     email = f.readline()
@@ -14,11 +14,11 @@ with open('credentials.txt', mode='r') as f:
 search_url = f"https://{subdomain}.zendesk.com/api/v2/search.json"
 please = f'{email}/token', api_token
 
-# Cleaning up previous output
+## --Cleaning up previous output-- ##
 if os.path.exists("output.txt"):
     os.remove("output.txt")
 
-# Setting the query
+## --Setting the query-- ##
 options = h.printMenu()
 optionsDict = {0 : "ticket_type:", 1 : "subject:\"", 2 : "created", 3 : "requester:", 4 : "assignee:",
                5 : "form:\"", 6 : "tags:", 7 : "group:\"", 8 : "status"}
