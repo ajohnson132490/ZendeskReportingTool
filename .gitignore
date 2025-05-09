@@ -1,3 +1,6 @@
 *.txt
 __pycache__/
 Reports/
+myenv/
+
+!requirements.txt
