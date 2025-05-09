@@ -1,3 +1,4 @@
+import json
 import requests
 
 def printMenu():
@@ -72,7 +73,12 @@ def printMenu():
         
     return populatedSelections
 
-def searchForUserById(userId, please) :
+def outputLastPageToTxt(response):
+    json_string = json.dumps(response.json(), indent=2)
+    with open('json.txt', mode='w', encoding='utf-8') as f:
+        f.write(json_string)
+
+def searchForUserById(userId, please):
     try:
         users_url = "https://cotservicedesk.zendesk.com/api/v2/users/" + str(userId) + ".json"
         user = requests.get(users_url, auth = please).json()
@@ -108,3 +114,23 @@ def getGroupById(groupId, please):
     groups_url = "https://cotservicedesk.zendesk.com/api/v2/groups/" + str(groupId) + ".json"
     group = requests.get(groups_url, auth = please).json()
     return group["group"]["name"]
+
+def manuallySearchTickets(filename, groupname, please):
+    with open(filename, mode='r', encoding='utf-8') as f:
+        data = [json.loads(line) for line in f]
+
+    with open('output1.txt', mode='w', encoding='utf-8') as f:
+        for i in range(len(data)):
+            if (data[i]["group"]["name"] == groupname):
+                try:
+                    f.write(f"TITLE: {data[i]["subject"]}\n\n\nTICKET NUMBER: {data[i]["id"]},  CREATED AT: {data[i]["created_at"]}, LAST UPDATED: {data[i]["updated_at"]}\
+                            \nREQUESTER: {data[i]["requester"]["name"]} ASSIGNEE: {data[i]["assignee"]["name"]}\
+                            \nTICKET FORM: {searchForTicketFormById(data[i]["ticket_form_id"], please)}\nPRIORITY: {data[i]["priority"]}\
+                            \nSTATUS: {data[i]["status"]}\nTAGS: {data[i]["tags"]}\nSATISFACTION RATING: {data[i]["satisfaction_rating"]}\n\n")
+                except:
+                    f.write(f"TITLE: {data[i]["subject"]}\n\n\nTICKET NUMBER: {data[i]["id"]},  CREATED AT: {data[i]["created_at"]}, LAST UPDATED: {data[i]["updated_at"]}\
+                            \nREQUESTER: {data[i]["requester"]["name"]} ASSIGNEE: Permanently deleted user\
+                            \nTICKET FORM: {searchForTicketFormById(data[i]["ticket_form_id"], please)}\nPRIORITY: {data[i]["priority"]}\
+                            \nSTATUS: {data[i]["status"]}\nTAGS: {data[i]["tags"]}\nSATISFACTION RATING: {data[i]["satisfaction_rating"]}\n\n")
+                f.write(getAllComments(data[i]["comments"], please))
+                f.write("\n\n\n\n\n--------------------------END TICKET--------------------------\n\n\n\n\n")
